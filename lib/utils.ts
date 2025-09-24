@@ -56,18 +56,3 @@ export function getCWVScoreColor(score: number): 'good' | 'warning' | 'poor' {
   if (score >= 75) return 'warning';
   return 'poor';
 }
-
-export function getBaseUrl(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_BASE_URL?.trim();
-  if (fromEnv) {
-    return fromEnv.replace(/\/+$/, '');
-  }
-
-  const vercelHost = process.env.VERCEL_URL?.trim();
-  if (vercelHost) {
-    const normalizedHost = vercelHost.startsWith('http') ? vercelHost : `https://${vercelHost}`;
-    return normalizedHost.replace(/\/+$/, '');
-  }
-
-  return '';
-}

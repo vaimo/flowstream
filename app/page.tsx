@@ -1,9 +1,9 @@
 import { Project, ProjectMetrics } from '../lib/types';
-import { getCacheOptions } from '../lib/cache';
 import { ProjectCard } from '../components/ProjectCard';
 import { BarChart } from '../lib/charts';
 import { InteractivePerformanceChart } from '../components/InteractivePerformanceChart';
 import { calculateAggregatedMetrics, preparePerformanceTrendData, formatMetricValue } from '../lib/aggregations';
+import { repo } from '../lib/repo/memoryRepo';
 import {
   getScoreColor,
   formatLCP,
@@ -14,29 +14,15 @@ import {
   getINPColor,
   calculateCWVScore,
   getCWVScoreColor,
-  getBaseUrl,
 } from '../lib/utils';
 import styles from '../styles/dashboard.module.css';
 
 async function getProjects(): Promise<Project[]> {
-  const baseUrl = getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/projects`, getCacheOptions('metrics'));
-  if (!res.ok) throw new Error('Failed to fetch projects');
-  return res.json();
+  return repo.getProjects();
 }
 
 async function getAllProjectMetrics(projectId: string): Promise<ProjectMetrics[]> {
-  try {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(
-      `${baseUrl}/api/projects/${projectId}/metrics`,
-      getCacheOptions('metrics', projectId)
-    );
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+  return repo.getProjectMetrics(projectId);
 }
 
 export default async function HomePage() {

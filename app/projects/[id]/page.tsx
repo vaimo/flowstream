@@ -1,5 +1,4 @@
 import { Project, ProjectMetrics } from '../../../lib/types';
-import { getCacheOptions } from '../../../lib/cache';
 import {
   formatScore,
   getScoreColor,
@@ -11,7 +10,6 @@ import {
   getINPColor,
   calculateCWVScore,
   getCWVScoreColor,
-  getBaseUrl,
 } from '../../../lib/utils';
 import { BarChart } from '../../../lib/charts';
 import { SuggestionPanel } from '../../../components/SuggestionPanel';
@@ -22,6 +20,7 @@ import { InteractiveFlowChart } from '../../../components/InteractiveFlowChart';
 import { ClsTrendChart } from '../../../components/ClsTrendChart';
 import styles from '../../../styles/dashboard.module.css';
 import { getAccessibilityScore, deriveAccessibilityFromMetrics } from '../../../lib/accessibility';
+import { repo } from '../../../lib/repo/memoryRepo';
 
 const qualityWindowFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
@@ -43,29 +42,12 @@ function formatQualityWindowRange(start?: string, end?: string): string {
 }
 
 async function getProject(id: string): Promise<Project | null> {
-  try {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/api/projects`, getCacheOptions('metrics'));
-    if (!res.ok) return null;
-    const projects = await res.json();
-    return projects.find((p: Project) => p.id === id) || null;
-  } catch {
-    return null;
-  }
+  const projects = await repo.getProjects();
+  return projects.find(p => p.id === id) || null;
 }
 
 async function getProjectMetrics(projectId: string): Promise<ProjectMetrics[]> {
-  try {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(
-      `${baseUrl}/api/projects/${projectId}/metrics`,
-      getCacheOptions('metrics', projectId)
-    );
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
+  return repo.getProjectMetrics(projectId);
 }
 
 export default async function ProjectDetailPage({
