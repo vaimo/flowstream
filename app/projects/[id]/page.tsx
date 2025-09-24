@@ -10,7 +10,8 @@ import {
   getCLSColor,
   getINPColor,
   calculateCWVScore,
-  getCWVScoreColor
+  getCWVScoreColor,
+  getBaseUrl,
 } from '../../../lib/utils';
 import { BarChart } from '../../../lib/charts';
 import { SuggestionPanel } from '../../../components/SuggestionPanel';
@@ -43,7 +44,8 @@ function formatQualityWindowRange(start?: string, end?: string): string {
 
 async function getProject(id: string): Promise<Project | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projects`, getCacheOptions('metrics'));
+    const baseUrl = getBaseUrl();
+    const res = await fetch(`${baseUrl}/api/projects`, getCacheOptions('metrics'));
     if (!res.ok) return null;
     const projects = await res.json();
     return projects.find((p: Project) => p.id === id) || null;
@@ -54,8 +56,9 @@ async function getProject(id: string): Promise<Project | null> {
 
 async function getProjectMetrics(projectId: string): Promise<ProjectMetrics[]> {
   try {
+    const baseUrl = getBaseUrl();
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projects/${projectId}/metrics`,
+      `${baseUrl}/api/projects/${projectId}/metrics`,
       getCacheOptions('metrics', projectId)
     );
     if (!res.ok) return [];

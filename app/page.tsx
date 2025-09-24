@@ -13,20 +13,23 @@ import {
   getCLSColor,
   getINPColor,
   calculateCWVScore,
-  getCWVScoreColor
+  getCWVScoreColor,
+  getBaseUrl,
 } from '../lib/utils';
 import styles from '../styles/dashboard.module.css';
 
 async function getProjects(): Promise<Project[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projects`, getCacheOptions('metrics'));
+  const baseUrl = getBaseUrl();
+  const res = await fetch(`${baseUrl}/api/projects`, getCacheOptions('metrics'));
   if (!res.ok) throw new Error('Failed to fetch projects');
   return res.json();
 }
 
 async function getAllProjectMetrics(projectId: string): Promise<ProjectMetrics[]> {
   try {
+    const baseUrl = getBaseUrl();
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/projects/${projectId}/metrics`,
+      `${baseUrl}/api/projects/${projectId}/metrics`,
       getCacheOptions('metrics', projectId)
     );
     if (!res.ok) return [];
