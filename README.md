@@ -69,6 +69,15 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+#### Manual accessibility audit (axe-core + Playwright)
+
+```bash
+# Audit a specific homepage (outputs JSON to stdout)
+npm run audit:a11y -- diptyque https://www.diptyqueparis.com/
+```
+
+Reports can also be generated automatically by the `Accessibility Audit` GitHub Action (see `.github/workflows/accessibility-audit.yml`).
+
 ## API Usage
 
 All non-GET endpoints require the `X-API-Key` header.

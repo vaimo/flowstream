@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audit:a11y": "tsx scripts/accessibility-audit.ts"
   },
   "dependencies": {
     "next": "15.0.3",
@@ -24,12 +25,5 @@
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "15.0.3"
-  },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "audit:a11y": "tsx scripts/accessibility-audit.ts"
   }
 }
