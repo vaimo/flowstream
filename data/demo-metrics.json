@@ -1,0 +1,134 @@
+[
+  {
+    "projectId": "diptyque",
+    "month": "2025-03",
+    "perf": {
+      "coreWebVitals": { "lcp": 1.8, "cls": 0.05, "inp": 95 },
+      "accessibility": 0.94,
+      "bestPractices": 0.96,
+      "seo": 0.95
+    },
+    "flow": {
+      "throughputRatio": 0.78,
+      "wipRatio": 0.32,
+      "qualitySpecial": 0.9,
+      "cycleTimeP50": 2,
+      "cycleTimeP85": 5,
+      "cycleTimeP95": 8,
+      "wipCount": 6,
+      "throughputCount": 25,
+      "totalItemsCount": 32,
+      "qualityIssuesCount": 1
+    }
+  },
+  {
+    "projectId": "diptyque",
+    "month": "2025-02",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.1, "cls": 0.07, "inp": 110 },
+      "accessibility": 0.92,
+      "bestPractices": 0.94,
+      "seo": 0.93
+    },
+    "flow": {
+      "throughputRatio": 0.74,
+      "wipRatio": 0.35,
+      "qualitySpecial": 0.86,
+      "cycleTimeP50": 3,
+      "cycleTimeP85": 6,
+      "cycleTimeP95": 9,
+      "wipCount": 8,
+      "throughputCount": 22,
+      "totalItemsCount": 30,
+      "qualityIssuesCount": 2
+    }
+  },
+  {
+    "projectId": "diptyque",
+    "month": "2025-01",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.3, "cls": 0.09, "inp": 128 },
+      "accessibility": 0.9,
+      "bestPractices": 0.92,
+      "seo": 0.91
+    },
+    "flow": {
+      "throughputRatio": 0.7,
+      "wipRatio": 0.38,
+      "qualitySpecial": 0.82,
+      "cycleTimeP50": 3,
+      "cycleTimeP85": 7,
+      "cycleTimeP95": 10,
+      "wipCount": 9,
+      "throughputCount": 20,
+      "totalItemsCount": 29,
+      "qualityIssuesCount": 3
+    }
+  },
+  {
+    "projectId": "elon",
+    "month": "2025-03",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.6, "cls": 0.08, "inp": 165 },
+      "accessibility": 0.84,
+      "bestPractices": 0.9,
+      "seo": 0.89
+    },
+    "flow": {
+      "throughputRatio": 0.58,
+      "wipRatio": 0.48,
+      "qualitySpecial": 0.74,
+      "cycleTimeP50": 5,
+      "cycleTimeP85": 11,
+      "cycleTimeP95": 15,
+      "wipCount": 10,
+      "throughputCount": 14,
+      "totalItemsCount": 24,
+      "qualityIssuesCount": 2
+    }
+  },
+  {
+    "projectId": "elon",
+    "month": "2025-02",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.9, "cls": 0.11, "inp": 190 },
+      "accessibility": 0.8,
+      "bestPractices": 0.88,
+      "seo": 0.87
+    },
+    "flow": {
+      "throughputRatio": 0.54,
+      "wipRatio": 0.51,
+      "qualitySpecial": 0.7,
+      "cycleTimeP50": 6,
+      "cycleTimeP85": 13,
+      "cycleTimeP95": 18,
+      "wipCount": 12,
+      "throughputCount": 12,
+      "totalItemsCount": 22,
+      "qualityIssuesCount": 3
+    }
+  },
+  {
+    "projectId": "elon",
+    "month": "2025-01",
+    "perf": {
+      "coreWebVitals": { "lcp": 3.1, "cls": 0.13, "inp": 210 },
+      "accessibility": 0.78,
+      "bestPractices": 0.86,
+      "seo": 0.85
+    },
+    "flow": {
+      "throughputRatio": 0.5,
+      "wipRatio": 0.55,
+      "qualitySpecial": 0.66,
+      "cycleTimeP50": 7,
+      "cycleTimeP85": 14,
+      "cycleTimeP95": 20,
+      "wipCount": 13,
+      "throughputCount": 11,
+      "totalItemsCount": 21,
+      "qualityIssuesCount": 4
+    }
+  }
+]

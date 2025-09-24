@@ -1,0 +1,20 @@
+[
+  {
+    "id": "diptyque",
+    "name": "Diptyque",
+    "url": "https://www.diptyqueparis.com/",
+    "description": "Luxury fragrance and lifestyle brand",
+    "tags": ["luxury", "fragrance", "ecommerce"],
+    "jiraKey": "DPTQ",
+    "updatedAt": "2025-05-01T10:00:00.000Z"
+  },
+  {
+    "id": "elon",
+    "name": "Elon",
+    "url": "https://www.elon.se/",
+    "description": "Nordic home electronics retailer",
+    "tags": ["retail", "electronics", "ecommerce"],
+    "jiraKey": "ELONMVP",
+    "updatedAt": "2025-05-01T10:00:00.000Z"
+  }
+]
