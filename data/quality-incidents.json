@@ -1,17 +1,13 @@
 [
-  { "projectId": "diptyque", "key": "DPTQ-341", "category": "failed-test", "status": "open", "detectedAt": "2025-03-22T10:12:00.000Z" },
-  { "projectId": "diptyque", "key": "DPTQ-312", "category": "failed-test", "status": "resolved", "detectedAt": "2025-02-19T08:30:00.000Z", "resolvedAt": "2025-02-24T14:45:00.000Z" },
-  { "projectId": "diptyque", "key": "DPTQ-308", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-02-23T15:05:00.000Z", "resolvedAt": "2025-03-02T09:10:00.000Z" },
-  { "projectId": "diptyque", "key": "DPTQ-288", "category": "failed-test", "status": "resolved", "detectedAt": "2025-01-19T11:50:00.000Z", "resolvedAt": "2025-01-25T16:22:00.000Z" },
-  { "projectId": "diptyque", "key": "DPTQ-275", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-01-22T09:18:00.000Z", "resolvedAt": "2025-01-27T18:40:00.000Z" },
-  { "projectId": "diptyque", "key": "DPTQ-269", "category": "failed-test", "status": "resolved", "detectedAt": "2025-01-26T13:05:00.000Z", "resolvedAt": "2025-02-01T07:55:00.000Z" },
-  { "projectId": "elon", "key": "ELON-421", "category": "failed-test", "status": "open", "detectedAt": "2025-03-20T07:15:00.000Z" },
-  { "projectId": "elon", "key": "ELON-418", "category": "reopened-bug", "status": "open", "detectedAt": "2025-03-24T12:48:00.000Z" },
-  { "projectId": "elon", "key": "ELON-397", "category": "failed-test", "status": "resolved", "detectedAt": "2025-02-18T10:30:00.000Z", "resolvedAt": "2025-02-23T19:05:00.000Z" },
-  { "projectId": "elon", "key": "ELON-392", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-02-21T14:42:00.000Z", "resolvedAt": "2025-02-28T09:33:00.000Z" },
-  { "projectId": "elon", "key": "ELON-389", "category": "failed-test", "status": "resolved", "detectedAt": "2025-02-24T09:05:00.000Z", "resolvedAt": "2025-03-03T08:10:00.000Z" },
-  { "projectId": "elon", "key": "ELON-361", "category": "failed-test", "status": "resolved", "detectedAt": "2025-01-18T07:58:00.000Z", "resolvedAt": "2025-01-23T12:20:00.000Z" },
-  { "projectId": "elon", "key": "ELON-357", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-01-21T11:05:00.000Z", "resolvedAt": "2025-01-28T09:55:00.000Z" },
-  { "projectId": "elon", "key": "ELON-352", "category": "failed-test", "status": "resolved", "detectedAt": "2025-01-24T15:30:00.000Z", "resolvedAt": "2025-02-01T10:18:00.000Z" },
-  { "projectId": "elon", "key": "ELON-349", "category": "failed-test", "status": "resolved", "detectedAt": "2025-01-27T09:12:00.000Z", "resolvedAt": "2025-02-04T16:42:00.000Z" }
+  { "projectId": "diptyque", "key": "DPTQ-412", "category": "failed-test", "status": "open", "detectedAt": "2025-09-18T08:45:00.000Z" },
+  { "projectId": "diptyque", "key": "DPTQ-405", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-09-05T12:20:00.000Z", "resolvedAt": "2025-09-08T16:10:00.000Z" },
+  { "projectId": "diptyque", "key": "DPTQ-398", "category": "failed-test", "status": "resolved", "detectedAt": "2025-08-14T09:32:00.000Z", "resolvedAt": "2025-08-18T11:05:00.000Z" },
+  { "projectId": "diptyque", "key": "DPTQ-387", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-08-02T10:15:00.000Z", "resolvedAt": "2025-08-06T15:25:00.000Z" },
+  { "projectId": "diptyque", "key": "DPTQ-372", "category": "failed-test", "status": "resolved", "detectedAt": "2025-07-12T13:48:00.000Z", "resolvedAt": "2025-07-15T18:00:00.000Z" },
+  { "projectId": "elon", "key": "ELON-468", "category": "failed-test", "status": "open", "detectedAt": "2025-09-19T07:05:00.000Z" },
+  { "projectId": "elon", "key": "ELON-463", "category": "reopened-bug", "status": "open", "detectedAt": "2025-09-16T11:42:00.000Z" },
+  { "projectId": "elon", "key": "ELON-452", "category": "failed-test", "status": "resolved", "detectedAt": "2025-08-21T09:18:00.000Z", "resolvedAt": "2025-08-27T14:55:00.000Z" },
+  { "projectId": "elon", "key": "ELON-447", "category": "reopened-bug", "status": "resolved", "detectedAt": "2025-08-09T15:20:00.000Z", "resolvedAt": "2025-08-14T10:05:00.000Z" },
+  { "projectId": "elon", "key": "ELON-438", "category": "failed-test", "status": "resolved", "detectedAt": "2025-07-23T08:40:00.000Z", "resolvedAt": "2025-07-29T09:30:00.000Z" },
+  { "projectId": "elon", "key": "ELON-431", "category": "failed-test", "status": "resolved", "detectedAt": "2025-07-10T12:12:00.000Z", "resolvedAt": "2025-07-16T16:18:00.000Z" }
 ]
