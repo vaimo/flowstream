@@ -6,7 +6,9 @@ import qualityIncidentsData from '../../data/quality-incidents.json';
 let projects: Project[] = [...projectsData];
 let metrics: ProjectMetrics[] = [...metricsData];
 let suggestions: { [projectId: string]: Suggestion[] } = {};
-const qualityIncidents: QualityIncident[] = [...qualityIncidentsData];
+const qualityIncidents: QualityIncident[] = (
+  qualityIncidentsData as QualityIncident[]
+).map(incident => ({ ...incident }));
 
 const QUALITY_WINDOW_DAYS = 14;
 
