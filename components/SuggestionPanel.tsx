@@ -13,13 +13,30 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const enforceTopSuggestions = (items: Suggestion[]) => {
+    const limit = 3;
+    const sorted = [...items].sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return bTime - aTime;
+    });
+
+    const ai = sorted.filter(item => item.source === 'ai');
+    const fallback = sorted.filter(item => item.source !== 'ai');
+    const limitedAi = ai.slice(0, limit);
+    const slotsRemaining = limit - limitedAi.length;
+    const extras = slotsRemaining > 0 ? fallback.slice(0, slotsRemaining) : [];
+
+    return [...limitedAi, ...extras];
+  };
+
   useEffect(() => {
     async function fetchSuggestions() {
       try {
         const res = await fetch(`/api/suggestions/${projectId}`);
         if (res.ok) {
           const data = await res.json();
-          setSuggestions(data);
+          setSuggestions(enforceTopSuggestions(data));
         }
       } catch (error) {
         console.error('Failed to fetch suggestions:', error);
@@ -57,16 +74,20 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
 
         // Update the existing suggestion
         setSuggestions(prev =>
-          prev.map(s =>
-            s.id === suggestionId
-              ? { ...s, status, updatedAt: new Date().toISOString() }
-              : s
+          enforceTopSuggestions(
+            prev.map(s =>
+              s.id === suggestionId
+                ? { ...s, status, updatedAt: new Date().toISOString() }
+                : s
+            )
           )
         );
 
         // Add new suggestion if provided
         if (result.next) {
-          setSuggestions(prev => [...prev, result.next]);
+          setSuggestions(prev =>
+            enforceTopSuggestions([...prev, result.next])
+          );
         }
       } else {
         console.error('Failed to update suggestion status');
@@ -82,10 +103,12 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
     } else {
       // If unchecked, revert to 'new' status
       setSuggestions(prev =>
-        prev.map(s =>
-          s.id === suggestion.id
-            ? { ...s, status: 'new' as const, updatedAt: new Date().toISOString() }
-            : s
+        enforceTopSuggestions(
+          prev.map(s =>
+            s.id === suggestion.id
+              ? { ...s, status: 'new' as const, updatedAt: new Date().toISOString() }
+              : s
+          )
         )
       );
     }

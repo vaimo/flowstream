@@ -89,6 +89,20 @@ export class MemoryRepo {
     };
 
     suggestions[projectId].push(newSuggestion);
+
+    if (newSuggestion.source === 'ai') {
+      const aiSuggestions = suggestions[projectId]
+        .filter(s => s.source === 'ai')
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      if (aiSuggestions.length > 3) {
+        const toRemove = new Set(aiSuggestions.slice(3).map(s => s.id));
+        suggestions[projectId] = suggestions[projectId].filter(
+          s => !(s.source === 'ai' && toRemove.has(s.id))
+        );
+      }
+    }
+
     return newSuggestion;
   }
 
