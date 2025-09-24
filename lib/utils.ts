@@ -69,5 +69,5 @@ export function getBaseUrl(): string {
     return normalizedHost.replace(/\/+$/, '');
   }
 
-  return 'http://localhost:3000';
+  return '';
 }
