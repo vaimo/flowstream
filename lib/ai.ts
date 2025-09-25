@@ -49,13 +49,12 @@ export async function generateAiSuggestions(input: AiSuggestionInput): Promise<A
       - Accessibility: ${Math.round(latestMetrics.perf.accessibility * 100)}%
       - Throughput: ${Math.round(latestMetrics.flow.throughputRatio * 100)}%
       - WIP items: ${latestMetrics.flow.wipCount ?? Math.round(latestMetrics.flow.wipRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
-      - Completed items: ${latestMetrics.flow.throughputCount ?? Math.round(latestMetrics.flow.throughputRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
+      - Throughput items: ${latestMetrics.flow.throughputCount ?? Math.round(latestMetrics.flow.throughputRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
       - Quality issues (14d): ${latestMetrics.flow.qualityIssuesCount ?? 0}
   
-    Historical trend:  
-    ${groupedHistory || '- no history available'}  
-    Previously completed suggestion (avoid repeating):  
-    ${completedSuggestionText ? `"${completedSuggestionText}"` : 'none'}  
+    Historical trend (latest to oldest):
+    ${groupedHistory || '- no history available'}
+    ${completedSuggestionText ? `Previously completed suggestion: "${completedSuggestionText}"` : ''}
 
   # Rules:
     - Focus on improving web performance, accessibility, or delivery flow.
@@ -69,7 +68,7 @@ export async function generateAiSuggestions(input: AiSuggestionInput): Promise<A
     - Return only the JSON, no extra text.
         `;
 
-    try {
+  try {
     const response = await fetch(OPENAI_ENDPOINT, {
       method: 'POST',
       headers: {

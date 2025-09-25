@@ -173,27 +173,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Health Status Overview */}
-      <div className="card mb-4">
-        <div className="flex-between mb-2">
-          <h3>Project Health Overview</h3>
-          <div className="flex">
-            <span className="badge success" style={{ marginRight: '0.5rem' }}>
-              {aggregated.healthyProjects} Healthy
-            </span>
-            <span className="badge warning" style={{ marginRight: '0.5rem' }}>
-              {aggregated.atRiskProjects} At Risk
-            </span>
-            <span className="badge" style={{ background: '#e74c3c', color: '#fff' }}>
-              {aggregated.criticalProjects} Critical
-            </span>
-          </div>
-        </div>
-        <p className="text-small">
-          Health score based on performance, accessibility, and flow metrics.
-        </p>
-      </div>
-
       {/* Charts */}
       {trendData.length > 0 && (
         <div className="grid mb-4">

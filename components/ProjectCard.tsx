@@ -12,7 +12,10 @@ import {
   getCLSColor,
   getINPColor,
   calculateCWVScore,
-  getCWVScoreColor
+  getCWVScoreColor,
+  calculateProjectHealth,
+  getHealthStatusLabel,
+  getHealthStatusColor
 } from '../lib/utils';
 import styles from '../styles/dashboard.module.css';
 
@@ -23,6 +26,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, metrics }: ProjectCardProps) {
   const router = useRouter();
+  const healthStatus = calculateProjectHealth(metrics);
 
   const handleCardClick = () => {
     router.push(`/projects/${project.id}`);
@@ -36,7 +40,12 @@ export function ProjectCard({ project, metrics }: ProjectCardProps) {
     <div className={styles.projectCard} onClick={handleCardClick}>
         <div className={styles.projectHeader}>
           <div>
-            <h3 className={styles.projectTitle}>{project.name}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <h3 className={styles.projectTitle}>{project.name}</h3>
+              <span className={`badge ${getHealthStatusColor(healthStatus)}`}>
+                {getHealthStatusLabel(healthStatus)}
+              </span>
+            </div>
             <a
               href={project.url}
               target="_blank"
@@ -94,13 +103,13 @@ export function ProjectCard({ project, metrics }: ProjectCardProps) {
             <div className={styles.metric}>
               <div className={styles.metricLabel}>Quality</div>
               <div className={`${styles.metricValue} ${styles[getScoreColor(metrics.flow.qualitySpecial)]}`}>
-                {formatScore(metrics.flow.qualitySpecial)}
+                {metrics.flow.qualitySpecial > 0 ? formatScore(metrics.flow.qualitySpecial) : 'N/A'}
               </div>
             </div>
             <div className={styles.metric}>
               <div className={styles.metricLabel}>Cycle P50</div>
               <div className={styles.metricValue}>
-                {metrics.flow.cycleTimeP50}d
+                {metrics.flow.cycleTimeP50 > 0 ? `${metrics.flow.cycleTimeP50}d` : 'N/A'}
               </div>
             </div>
           </div>
