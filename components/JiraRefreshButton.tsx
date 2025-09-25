@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useProjectDataContext } from './providers/ProjectDataProvider';
 
 interface JiraRefreshButtonProps {
   projectId: string;
@@ -10,10 +11,18 @@ interface JiraRefreshButtonProps {
 export function JiraRefreshButton({ projectId, projectName }: JiraRefreshButtonProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [message, setMessage] = useState('');
+  const { setProjectMetrics } = useProjectDataContext();
+
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
 
   const refreshJiraData = async () => {
     setRefreshing(true);
     setMessage('');
+
+    const targetMonth = getCurrentMonth();
 
     try {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY || 'development-key';
@@ -26,18 +35,28 @@ export function JiraRefreshButton({ projectId, projectName }: JiraRefreshButtonP
         },
         body: JSON.stringify({
           projectId,
+          month: targetMonth,
         }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setMessage(`✓ Flow metrics updated from Jira (${result.data.jiraKey})`);
+        try {
+          const metricsResponse = await fetch(`/api/projects/${projectId}/metrics`);
+          if (metricsResponse.ok) {
+            const metrics = await metricsResponse.json();
+            if (Array.isArray(metrics)) {
+              setProjectMetrics(projectId, metrics);
+            }
+          } else {
+            console.warn('Failed to refresh metrics after Jira update');
+          }
+        } catch (refreshError) {
+          console.warn('Failed to update cached metrics after Jira refresh:', refreshError);
+        }
 
-        // Refresh the page after successful update
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        setMessage(`✓ Flow metrics updated from Jira (${result.data.jiraKey})`);
       } else {
         setMessage(`✗ Failed: ${result.error || 'Unknown error'}`);
       }

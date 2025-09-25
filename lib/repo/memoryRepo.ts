@@ -247,11 +247,30 @@ export class MemoryRepo {
       suggestions[projectId] = [];
     }
 
+    const suggestionId = createSuggestionId(projectId, suggestion.text);
+    const existingIndex = suggestions[projectId].findIndex(s => s.id === suggestionId);
+    const now = new Date().toISOString();
+
+    if (existingIndex >= 0) {
+      const existing = suggestions[projectId][existingIndex];
+      const updatedSuggestion: Suggestion = {
+        ...existing,
+        ...suggestion,
+        id: suggestionId,
+        createdAt: existing.createdAt,
+        updatedAt: now,
+        status: existing.status,
+      };
+
+      suggestions[projectId][existingIndex] = updatedSuggestion;
+      return updatedSuggestion;
+    }
+
     const newSuggestion: Suggestion = {
       ...suggestion,
-      id: Math.random().toString(36).substring(2, 15),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      id: suggestionId,
+      createdAt: now,
+      updatedAt: now,
     };
 
     suggestions[projectId].push(newSuggestion);
@@ -386,4 +405,15 @@ function getDefaultSeo(projectId: string): number {
   if (projectId === 'swissense') return 0.78;
   if (projectId === 'byredo') return 0.90;
   return 0.80; // Default
+}
+
+function createSuggestionId(projectId: string, text: string): string {
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40);
+
+  const base = normalized || 'suggestion';
+  return `${projectId}-${base}`;
 }

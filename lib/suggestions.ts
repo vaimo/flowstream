@@ -130,7 +130,7 @@ export async function generateSuggestions(projectId: string): Promise<Suggestion
     newSuggestions.push(suggestion);
   }
 
-  return [...existingSuggestions, ...newSuggestions];
+  return repo.getSuggestions(projectId);
 }
 
 export async function getNextSuggestion(projectId: string, completedText: string): Promise<Suggestion | null> {
@@ -154,7 +154,7 @@ export async function getNextSuggestion(projectId: string, completedText: string
 
   if (aiGenerated.length > 0) {
     const aiSuggestion = aiGenerated[0];
-    return await repo.createSuggestion(projectId, {
+    return repo.createSuggestion(projectId, {
       text: aiSuggestion.text,
       rationale: aiSuggestion.rationale,
       source: 'ai',
@@ -173,7 +173,7 @@ export async function getNextSuggestion(projectId: string, completedText: string
 
   // Create and return the first applicable suggestion
   const rule = applicableRules[0];
-  return await repo.createSuggestion(projectId, {
+  return repo.createSuggestion(projectId, {
     text: rule.text,
     rationale: rule.rationale,
     source: 'rule',

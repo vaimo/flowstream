@@ -29,13 +29,40 @@ export async function POST(
   const resolvedParams = await params;
   try {
     const body = await request.json();
-    const { suggestionId, status, completedText } = body;
+    const { suggestionId, status, completedText, suggestion } = body;
 
-    const updatedSuggestion = await repo.updateSuggestion(
+    if (suggestion && typeof suggestion.text === 'string') {
+      await repo.createSuggestion(resolvedParams.id, {
+        text: suggestion.text,
+        rationale: suggestion.rationale ?? '',
+        source: suggestion.source ?? 'ai',
+        status: suggestion.status ?? 'new',
+      });
+    } else {
+      // Ensure suggestions exist for this invocation (important on serverless)
+      await generateSuggestions(resolvedParams.id);
+    }
+
+    let updatedSuggestion = await repo.updateSuggestion(
       resolvedParams.id,
       suggestionId,
       { status }
     );
+
+    if (!updatedSuggestion && suggestion && typeof suggestion.text === 'string') {
+      await repo.createSuggestion(resolvedParams.id, {
+        text: suggestion.text,
+        rationale: suggestion.rationale ?? '',
+        source: suggestion.source ?? 'ai',
+        status: suggestion.status ?? 'new',
+      });
+
+      updatedSuggestion = await repo.updateSuggestion(
+        resolvedParams.id,
+        suggestionId,
+        { status }
+      );
+    }
 
     if (!updatedSuggestion) {
       return NextResponse.json(

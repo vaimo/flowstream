@@ -49,7 +49,7 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
   }, [projectId]);
 
   const updateSuggestionStatus = async (
-    suggestionId: string,
+    suggestion: Suggestion,
     status: 'done' | 'irrelevant',
     completedText: string
   ) => {
@@ -63,9 +63,10 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
           'X-API-Key': apiKey,
         },
         body: JSON.stringify({
-          suggestionId,
+          suggestionId: suggestion.id,
           status,
           completedText,
+          suggestion,
         }),
       });
 
@@ -76,7 +77,7 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
         setSuggestions(prev =>
           enforceTopSuggestions(
             prev.map(s =>
-              s.id === suggestionId
+              s.id === suggestion.id
                 ? { ...s, status, updatedAt: new Date().toISOString() }
                 : s
             )
@@ -99,7 +100,7 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
 
   const handleCheckboxChange = (suggestion: Suggestion, checked: boolean) => {
     if (checked) {
-      updateSuggestionStatus(suggestion.id, 'done', suggestion.text);
+      updateSuggestionStatus(suggestion, 'done', suggestion.text);
     } else {
       // If unchecked, revert to 'new' status
       setSuggestions(prev =>
@@ -115,7 +116,7 @@ export function SuggestionPanel({ projectId }: SuggestionPanelProps) {
   };
 
   const markAsIrrelevant = (suggestion: Suggestion) => {
-    updateSuggestionStatus(suggestion.id, 'irrelevant', suggestion.text);
+    updateSuggestionStatus(suggestion, 'irrelevant', suggestion.text);
   };
 
   if (loading) {
