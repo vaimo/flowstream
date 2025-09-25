@@ -7,14 +7,13 @@ export function middleware(request: NextRequest) {
   // Only protect API routes (except GET requests)
   if (pathname.startsWith('/api/') && request.method !== 'GET') {
     const apiKey = request.headers.get('X-API-Key');
-    const expectedApiKey = process.env.API_KEY;
+    const expectedApiKey =
+      process.env.API_KEY ||
+      process.env.NEXT_PUBLIC_API_KEY ||
+      'development-key';
 
-    if (!expectedApiKey) {
-      console.warn('API_KEY environment variable not set');
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      );
+    if (!process.env.API_KEY) {
+      console.warn('API_KEY environment variable not set, using fallback for development');
     }
 
     if (!apiKey || apiKey !== expectedApiKey) {

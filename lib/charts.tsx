@@ -79,11 +79,12 @@ export function BarChart({
       {title && (
         <text
           x={width / 2}
-          y={15}
+          y={-15}
           textAnchor="middle"
           fill="var(--vaimo-jet)"
           fontSize="14"
           fontWeight="600"
+          style={{ marginBottom: '10px' }}
         >
           {title}
         </text>
