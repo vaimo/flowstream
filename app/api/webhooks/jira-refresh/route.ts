@@ -113,6 +113,20 @@ function getDefaultPerfData(projectId: string) {
       bestPractices: 0.83,
       seo: 0.81,
     };
+  } else if (projectId === 'swissense') {
+    return {
+      coreWebVitals: { lcp: 3.2, cls: 0.18, inp: 220 },
+      accessibility: 0.73,
+      bestPractices: 0.81,
+      seo: 0.78,
+    };
+  } else if (projectId === 'byredo') {
+    return {
+      coreWebVitals: { lcp: 2.1, cls: 0.08, inp: 125 },
+      accessibility: 0.88,
+      bestPractices: 0.92,
+      seo: 0.90,
+    };
   }
 
   // Default fallback

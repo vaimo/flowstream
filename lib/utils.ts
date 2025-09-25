@@ -1,4 +1,4 @@
-import { CoreWebVitals } from './types';
+import { CoreWebVitals, ProjectMetrics } from './types';
 
 export function formatScore(score: number): string {
   return Math.round(score * 100).toString();
@@ -55,4 +55,48 @@ export function getCWVScoreColor(score: number): 'good' | 'warning' | 'poor' {
   if (score >= 90) return 'good';
   if (score >= 75) return 'warning';
   return 'poor';
+}
+
+// Health status calculation
+export type HealthStatus = 'healthy' | 'at-risk' | 'critical';
+
+export function calculateProjectHealth(metrics: ProjectMetrics | null): HealthStatus {
+  if (!metrics) return 'critical';
+
+  // Calculate CWV score (0-1 scale)
+  const cwvScore = calculateCWVScore(metrics.perf.coreWebVitals) / 100;
+
+  const perfScore = (
+    cwvScore * 0.3 +
+    metrics.perf.accessibility * 0.2 +
+    metrics.perf.bestPractices * 0.2 +
+    metrics.perf.seo * 0.1
+  );
+
+  const flowScore = (
+    metrics.flow.throughputRatio * 0.1 +
+    metrics.flow.qualitySpecial * 0.1
+  );
+
+  const overallScore = perfScore + flowScore;
+
+  if (overallScore >= 0.8) return 'healthy';
+  if (overallScore >= 0.6) return 'at-risk';
+  return 'critical';
+}
+
+export function getHealthStatusLabel(status: HealthStatus): string {
+  switch (status) {
+    case 'healthy': return 'Healthy';
+    case 'at-risk': return 'At Risk';
+    case 'critical': return 'Critical';
+  }
+}
+
+export function getHealthStatusColor(status: HealthStatus): string {
+  switch (status) {
+    case 'healthy': return 'success';
+    case 'at-risk': return 'warning';
+    case 'critical': return 'danger';
+  }
 }

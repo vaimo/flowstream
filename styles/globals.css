@@ -106,6 +106,11 @@ button.secondary:hover {
   color: #fff;
 }
 
+.badge.danger {
+  background: #e74c3c;
+  color: #fff;
+}
+
 .tableRow {
   border-bottom: 1px solid var(--vaimo-light-gray);
   padding: 1rem;

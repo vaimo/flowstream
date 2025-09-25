@@ -16,5 +16,21 @@
     "tags": ["retail", "electronics", "ecommerce"],
     "jiraKey": "ELONMVP",
     "updatedAt": "2025-05-01T10:00:00.000Z"
+  },
+  {
+    "id": "swissense",
+    "name": "Swiss Sense",
+    "url": "http://swissense.nl/",
+    "description": "Swiss sleep solutions and mattress retail",
+    "tags": ["retail", "sleep", "ecommerce"],
+    "updatedAt": "2025-09-25T10:00:00.000Z"
+  },
+  {
+    "id": "byredo",
+    "name": "Byredo",
+    "url": "https://www.byredo.com/eu_en",
+    "description": "Luxury fragrance and lifestyle brand",
+    "tags": ["luxury", "fragrance", "ecommerce"],
+    "updatedAt": "2025-09-25T10:00:00.000Z"
   }
 ]

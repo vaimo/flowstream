@@ -34,7 +34,7 @@ export function InteractiveFlowChart({
     },
     {
       key: 'throughputCount',
-      label: 'Completed Items',
+      label: 'Throughput',
       color: 'var(--vaimo-jet)',
       enabled: true,
       unit: 'items'
@@ -125,7 +125,7 @@ export function InteractiveFlowChart({
         fontSize: '12px',
         color: 'rgba(51, 51, 51, 0.7)'
       }}>
-        <strong>Flow Metrics:</strong> Cycle Time tracks delivery speed (days), Completed Items shows how many stories finished inside the reporting window, WIP Items shows active work, and Quality Issues counts defects reopened in that window.
+        <strong>Flow Metrics:</strong> Cycle Time tracks delivery speed (days), Throughput shows how many stories finished inside the reporting window, WIP Items shows active work, and Quality Issues counts defects reopened in that window.
         Click metric buttons above to toggle them on/off.
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Project, ProjectMetrics, Suggestion, QualityIncident } from '../types';
 import projectsData from '../../data/projects.json';
 import metricsData from '../../data/demo-metrics.json';
 import qualityIncidentsData from '../../data/quality-incidents.json';
+import { fetchPerformanceMetrics } from '../performance-webhook';
 
 let projects: Project[] = [...projectsData];
 let metrics: ProjectMetrics[] = [...metricsData];
@@ -43,11 +44,58 @@ export class MemoryRepo {
 
   // Metrics
   async getProjectMetrics(projectId: string, month?: string): Promise<ProjectMetrics[]> {
+    const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+    // If requesting current month specifically, return webhook data only
+    if (month === currentMonth) {
+      return [await this.getCurrentMonthMetrics(projectId)];
+    }
+
+    // For historical data or all data request, use demo data for trends
     let result = metrics.filter(m => m.projectId === projectId);
     if (month) {
       result = result.filter(m => m.month === month);
     }
-    return result.map(metric => enrichQualityWindow(projectId, metric));
+
+    // If requesting all data, include current month webhook data + historical demo data
+    const historicalMetrics = result
+      .filter(m => m.month !== currentMonth)
+      .map(metric => enrichQualityWindow(projectId, metric));
+
+    if (!month) {
+      // Include current month data from webhook
+      const currentMetrics = await this.getCurrentMonthMetrics(projectId);
+      return [currentMetrics, ...historicalMetrics].sort((a, b) => b.month.localeCompare(a.month));
+    }
+
+    return historicalMetrics;
+  }
+
+  private async getCurrentMonthMetrics(projectId: string): Promise<ProjectMetrics> {
+    const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+    // Get live performance data from webhook
+    const livePerformanceData = await fetchPerformanceMetrics();
+
+    // Get flow data from existing demo data if available, otherwise use defaults
+    const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
+    const flowData = existingCurrentMonth?.flow || getDefaultFlowData(projectId);
+
+    return enrichQualityWindow(projectId, {
+      projectId,
+      month: currentMonth,
+      perf: {
+        coreWebVitals: {
+          lcp: livePerformanceData?.lcp || 2.5,
+          cls: livePerformanceData?.cls || 0.1,
+          inp: livePerformanceData?.inp || 200,
+        },
+        accessibility: getDefaultAccessibility(projectId),
+        bestPractices: getDefaultBestPractices(projectId),
+        seo: getDefaultSeo(projectId),
+      },
+      flow: flowData
+    });
   }
 
   async upsertProjectMetrics(data: ProjectMetrics): Promise<ProjectMetrics> {
@@ -65,12 +113,8 @@ export class MemoryRepo {
   }
 
   async getLatestMetrics(projectId: string): Promise<ProjectMetrics | null> {
-    const projectMetrics = metrics
-      .filter(m => m.projectId === projectId)
-      .sort((a, b) => b.month.localeCompare(a.month));
-
-    const latest = projectMetrics[0];
-    return latest ? enrichQualityWindow(projectId, latest) : null;
+    // Always return current month metrics from webhook for latest
+    return await this.getCurrentMonthMetrics(projectId);
   }
 
   // Suggestions
@@ -173,4 +217,53 @@ function calculateQualityWindowSnapshot(projectId: string, month: string): {
     windowStart: windowStartDate.toISOString(),
     windowEnd: windowEndDate.toISOString(),
   };
+}
+
+function getDefaultFlowData(projectId: string) {
+  // Use existing flow data from demo data if available
+  const demoData = metrics.find(m => m.projectId === projectId);
+  if (demoData?.flow) {
+    return demoData.flow;
+  }
+
+  // Default fallback for projects without flow data
+  return {
+    throughputRatio: 0.0,
+    wipRatio: 0.0,
+    qualitySpecial: 0.0,
+    cycleTimeP50: 0,
+    cycleTimeP85: 0,
+    cycleTimeP95: 0,
+    wipCount: 0,
+    throughputCount: 0,
+    totalItemsCount: 0,
+    qualityIssuesCount: 0,
+  };
+}
+
+function getDefaultAccessibility(projectId: string): number {
+  // Project-specific defaults
+  if (projectId === 'diptyque') return 0.91;
+  if (projectId === 'elon') return 0.76;
+  if (projectId === 'swissense') return 0.73;
+  if (projectId === 'byredo') return 0.88;
+  return 0.80; // Default
+}
+
+function getDefaultBestPractices(projectId: string): number {
+  // Project-specific defaults
+  if (projectId === 'diptyque') return 0.94;
+  if (projectId === 'elon') return 0.83;
+  if (projectId === 'swissense') return 0.81;
+  if (projectId === 'byredo') return 0.92;
+  return 0.85; // Default
+}
+
+function getDefaultSeo(projectId: string): number {
+  // Project-specific defaults
+  if (projectId === 'diptyque') return 0.93;
+  if (projectId === 'elon') return 0.81;
+  if (projectId === 'swissense') return 0.78;
+  if (projectId === 'byredo') return 0.90;
+  return 0.80; // Default
 }

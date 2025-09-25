@@ -10,6 +10,9 @@ import {
   getINPColor,
   calculateCWVScore,
   getCWVScoreColor,
+  calculateProjectHealth,
+  getHealthStatusLabel,
+  getHealthStatusColor,
 } from '../../../lib/utils';
 import { BarChart } from '../../../lib/charts';
 import { SuggestionPanel } from '../../../components/SuggestionPanel';
@@ -73,6 +76,7 @@ export default async function ProjectDetailPage({
   }
 
   const latestMetrics = metrics.sort((a, b) => b.month.localeCompare(a.month))[0];
+  const healthStatus = calculateProjectHealth(latestMetrics || null);
 
   const storedAccessibilityScore = deriveAccessibilityFromMetrics(latestMetrics ?? null);
   const accessibilityResult = project?.url
@@ -125,7 +129,12 @@ export default async function ProjectDetailPage({
 
       <div className="flex-between mb-4">
         <div>
-          <h1 className="text-xl mb-1">{project.name}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <h1 className="text-xl mb-1">{project.name}</h1>
+            <span className={`badge ${getHealthStatusColor(healthStatus)}`}>
+              {getHealthStatusLabel(healthStatus)}
+            </span>
+          </div>
           <a
             href={project.url}
             target="_blank"
@@ -223,10 +232,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={`${styles.kpiValue} ${styles[getScoreColor(latestMetrics.flow.throughputRatio)]}`}>
-                {throughputCountDisplay}
+                {throughputCountDisplay > 0 ? throughputCountDisplay : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                Completed stories in window • {throughputRateDisplay} throughput
+                {throughputCountDisplay > 0 ? `Completed stories in window • ${throughputRateDisplay} throughput` : 'No flow data available'}
               </div>
             </div>
 
@@ -236,10 +245,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={`${styles.kpiValue} ${styles[getScoreColor(1 - latestMetrics.flow.wipRatio)]}`}>
-                {wipCountDisplay}
+                {wipCountDisplay > 0 ? wipCountDisplay : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                Actively in progress • {wipRateDisplay} of total WIP
+                {wipCountDisplay > 0 ? `Actively in progress • ${wipRateDisplay} of total WIP` : 'No flow data available'}
               </div>
             </div>
 
@@ -249,10 +258,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={`${styles.kpiValue} ${styles[getScoreColor(latestMetrics.flow.qualitySpecial)]}`}>
-                {latestMetrics.flow.qualityIssuesCount ?? 0}
+                {latestMetrics.flow.qualitySpecial > 0 ? (latestMetrics.flow.qualityIssuesCount ?? 0) : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                Reopened defects ({qualityWindowRange})
+                {latestMetrics.flow.qualitySpecial > 0 ? `Reopened defects (${qualityWindowRange})` : 'No flow data available'}
               </div>
             </div>
 
@@ -262,10 +271,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={styles.kpiValue}>
-                {latestMetrics.flow.cycleTimeP50}d
+                {latestMetrics.flow.cycleTimeP50 > 0 ? `${latestMetrics.flow.cycleTimeP50}d` : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                Median delivery time
+                {latestMetrics.flow.cycleTimeP50 > 0 ? 'Median delivery time' : 'No flow data available'}
               </div>
             </div>
 
@@ -275,10 +284,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={styles.kpiValue}>
-                {latestMetrics.flow.cycleTimeP85}d
+                {latestMetrics.flow.cycleTimeP85 > 0 ? `${latestMetrics.flow.cycleTimeP85}d` : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                85th percentile delivery
+                {latestMetrics.flow.cycleTimeP85 > 0 ? '85th percentile delivery' : 'No flow data available'}
               </div>
             </div>
 
@@ -288,10 +297,10 @@ export default async function ProjectDetailPage({
                 <span className="badge">Flow</span>
               </div>
               <div className={styles.kpiValue}>
-                {latestMetrics.flow.cycleTimeP95}d
+                {latestMetrics.flow.cycleTimeP95 > 0 ? `${latestMetrics.flow.cycleTimeP95}d` : 'N/A'}
               </div>
               <div className={styles.kpiSubtext}>
-                95th percentile delivery
+                {latestMetrics.flow.cycleTimeP95 > 0 ? '95th percentile delivery' : 'No flow data available'}
               </div>
             </div>
           </div>
@@ -376,7 +385,7 @@ export default async function ProjectDetailPage({
               The completion rate shown beside the number is derived from completed vs. total committed work in that same window.
             </p>
             <div className={styles.flowMetricFormula}>
-              Formula: Completed Items ÷ Total Items Started (last 14 days) × 100%
+              Formula: Throughput Items ÷ Total Items Started (last 14 days) × 100%
             </div>
           </div>
 

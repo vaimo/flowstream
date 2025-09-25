@@ -130,5 +130,137 @@
       "totalItemsCount": 25,
       "qualityIssuesCount": 5
     }
+  },
+  {
+    "projectId": "swissense",
+    "month": "2025-09",
+    "perf": {
+      "coreWebVitals": { "lcp": 3.2, "cls": 0.18, "inp": 220 },
+      "accessibility": 0.73,
+      "bestPractices": 0.81,
+      "seo": 0.78
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
+  },
+  {
+    "projectId": "swissense",
+    "month": "2025-08",
+    "perf": {
+      "coreWebVitals": { "lcp": 3.4, "cls": 0.21, "inp": 235 },
+      "accessibility": 0.71,
+      "bestPractices": 0.79,
+      "seo": 0.76
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
+  },
+  {
+    "projectId": "byredo",
+    "month": "2025-09",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.1, "cls": 0.08, "inp": 125 },
+      "accessibility": 0.88,
+      "bestPractices": 0.92,
+      "seo": 0.90
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
+  },
+  {
+    "projectId": "byredo",
+    "month": "2025-08",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.3, "cls": 0.09, "inp": 138 },
+      "accessibility": 0.86,
+      "bestPractices": 0.90,
+      "seo": 0.88
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
+  },
+  {
+    "projectId": "swissense",
+    "month": "2025-07",
+    "perf": {
+      "coreWebVitals": { "lcp": 3.6, "cls": 0.23, "inp": 250 },
+      "accessibility": 0.69,
+      "bestPractices": 0.77,
+      "seo": 0.74
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
+  },
+  {
+    "projectId": "byredo",
+    "month": "2025-07",
+    "perf": {
+      "coreWebVitals": { "lcp": 2.5, "cls": 0.11, "inp": 152 },
+      "accessibility": 0.84,
+      "bestPractices": 0.88,
+      "seo": 0.86
+    },
+    "flow": {
+      "throughputRatio": 0.0,
+      "wipRatio": 0.0,
+      "qualitySpecial": 0.0,
+      "cycleTimeP50": 0,
+      "cycleTimeP85": 0,
+      "cycleTimeP95": 0,
+      "wipCount": 0,
+      "throughputCount": 0,
+      "totalItemsCount": 0,
+      "qualityIssuesCount": 0
+    }
   }
 ]
