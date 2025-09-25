@@ -66,7 +66,7 @@ export async function generateAiSuggestions(input: AiSuggestionInput): Promise<A
     - Output **strictly** as a JSON array of objects with:
         - "text": the suggestion
         - "rationale": the explanation
-    - Return only the JSON, no extra text.    
+    - Return only the JSON, no extra text.
         `;
 
     try {
