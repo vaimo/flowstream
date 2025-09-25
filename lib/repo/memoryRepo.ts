@@ -3,7 +3,7 @@ import projectsData from '../../data/projects.json';
 import metricsData from '../../data/demo-metrics.json';
 import qualityIncidentsData from '../../data/quality-incidents.json';
 import { fetchPerformanceMetricsForProject, fetchPerformanceMetricsForAllProjects, getProjectWebhookKey } from '../performance-webhook';
-import { getAccessibilityScore, deriveAccessibilityFromMetrics } from '../accessibility';
+import { getAccessibilityScore } from '../accessibility';
 
 let projects: Project[] = [...projectsData];
 let metrics: ProjectMetrics[] = [...metricsData];
@@ -13,6 +13,8 @@ const qualityIncidents: QualityIncident[] = (
 ).map(incident => ({ ...incident }));
 
 const QUALITY_WINDOW_DAYS = 14;
+const METRICS_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes aligned with webhook cache
+const latestMetricsCache = new Map<string, { metrics: ProjectMetrics; timestamp: number }>();
 
 export class MemoryRepo {
   // Projects
@@ -75,6 +77,11 @@ export class MemoryRepo {
   private async getCurrentMonthMetrics(projectId: string): Promise<ProjectMetrics> {
     const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
 
+    const cached = latestMetricsCache.get(projectId);
+    if (cached && cached.metrics.month === currentMonth && Date.now() - cached.timestamp < METRICS_CACHE_DURATION) {
+      return cached.metrics;
+    }
+
     // Get live performance data from webhook using project-specific key
     const webhookKey = getProjectWebhookKey(projectId);
     const livePerformanceData = await fetchPerformanceMetricsForProject(webhookKey);
@@ -98,7 +105,7 @@ export class MemoryRepo {
     const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
     const flowData = existingCurrentMonth?.flow || getDefaultFlowData(projectId);
 
-    return enrichQualityWindow(projectId, {
+    const enrichedMetrics = enrichQualityWindow(projectId, {
       projectId,
       month: currentMonth,
       perf: {
@@ -119,6 +126,10 @@ export class MemoryRepo {
       },
       flow: flowData
     });
+
+    latestMetricsCache.set(projectId, { metrics: enrichedMetrics, timestamp: Date.now() });
+
+    return enrichedMetrics;
   }
 
   async upsertProjectMetrics(data: ProjectMetrics): Promise<ProjectMetrics> {
@@ -128,10 +139,12 @@ export class MemoryRepo {
 
     if (existingIndex >= 0) {
       metrics[existingIndex] = data;
+      latestMetricsCache.delete(data.projectId);
       return enrichQualityWindow(data.projectId, metrics[existingIndex]);
     }
 
     metrics.push(data);
+    latestMetricsCache.delete(data.projectId);
     return enrichQualityWindow(data.projectId, data);
   }
 
@@ -149,59 +162,77 @@ export class MemoryRepo {
       // Single webhook call for all projects
       const allPerformanceData = await fetchPerformanceMetricsForAllProjects();
 
-      // Process each project
-      for (const project of projects) {
-        const projectId = project.id;
-        const webhookKey = getProjectWebhookKey(projectId);
-        const livePerformanceData = allPerformanceData.get(webhookKey);
+      const projectMetricsEntries = await Promise.all(
+        projects.map(async project => {
+          const projectId = project.id;
+          const webhookKey = getProjectWebhookKey(projectId);
+          const livePerformanceData = allPerformanceData.get(webhookKey);
 
-
-        // Get accessibility score (still per-project, but async)
-        let accessibilityScore = getDefaultAccessibility(projectId);
-        if (project.url) {
-          try {
-            const accessibilityResult = await getAccessibilityScore(project.url, accessibilityScore);
-            accessibilityScore = accessibilityResult.score;
-          } catch (error) {
-            console.warn(`Failed to fetch accessibility for ${projectId}:`, error);
+          // Fetch accessibility in parallel across projects
+          let accessibilityScore = getDefaultAccessibility(projectId);
+          if (project.url) {
+            try {
+              const accessibilityResult = await getAccessibilityScore(project.url, accessibilityScore);
+              accessibilityScore = accessibilityResult.score;
+            } catch (error) {
+              console.warn(`Failed to fetch accessibility for ${projectId}:`, error);
+            }
           }
-        }
 
-        // Get flow data
-        const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
-        const flowData = existingCurrentMonth?.flow || getDefaultFlowData(projectId);
+          // Get flow data
+          const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
+          const flowData = existingCurrentMonth?.flow || getDefaultFlowData(projectId);
 
-        const projectMetrics = enrichQualityWindow(projectId, {
-          projectId,
-          month: currentMonth,
-          perf: {
-            coreWebVitals: livePerformanceData ? {
-              lcp: livePerformanceData.mobile.lcp,
-              cls: livePerformanceData.mobile.cls,
-              inp: livePerformanceData.mobile.inp,
-            } : {
-              lcp: 2.8,
-              cls: 0.12,
-              inp: 220,
+          const projectMetrics = enrichQualityWindow(projectId, {
+            projectId,
+            month: currentMonth,
+            perf: {
+              coreWebVitals: livePerformanceData ? {
+                lcp: livePerformanceData.mobile.lcp,
+                cls: livePerformanceData.mobile.cls,
+                inp: livePerformanceData.mobile.inp,
+              } : {
+                lcp: 2.8,
+                cls: 0.12,
+                inp: 220,
+              },
+              coreWebVitalsDevice: livePerformanceData ? {
+                desktop: livePerformanceData.desktop,
+                mobile: livePerformanceData.mobile,
+              } : undefined,
+              accessibility: accessibilityScore,
+              bestPractices: getDefaultBestPractices(projectId),
+              seo: getDefaultSeo(projectId),
             },
-            coreWebVitalsDevice: livePerformanceData ? {
-              desktop: livePerformanceData.desktop,
-              mobile: livePerformanceData.mobile,
-            } : undefined,
-            accessibility: accessibilityScore,
-            bestPractices: getDefaultBestPractices(projectId),
-            seo: getDefaultSeo(projectId),
-          },
-          flow: flowData
-        });
+            flow: flowData
+          });
 
+          return { projectId, projectMetrics };
+        })
+      );
+
+      const timestamp = Date.now();
+      for (const { projectId, projectMetrics } of projectMetricsEntries) {
         results.set(projectId, projectMetrics);
+        latestMetricsCache.set(projectId, { metrics: projectMetrics, timestamp });
       }
 
       console.log(`Generated metrics for ${results.size} projects with single webhook call`);
       return results;
     } catch (error) {
       console.error('Error in batch metrics fetch:', error);
+
+      const now = Date.now();
+      for (const [projectId, cached] of latestMetricsCache.entries()) {
+        if (now - cached.timestamp < METRICS_CACHE_DURATION) {
+          results.set(projectId, cached.metrics);
+        }
+      }
+
+      if (results.size > 0) {
+        console.warn(`Returned ${results.size} cached project metrics due to webhook failure`);
+      }
+
       return results;
     }
   }

@@ -365,7 +365,7 @@ export default async function ProjectDetailPage({
               </div>
               <InteractiveFlowChart
                 metrics={metrics}
-                width="100%"
+                width={600}
                 height={350}
               />
             </div>
