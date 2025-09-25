@@ -31,30 +31,45 @@ export async function generateAiSuggestions(input: AiSuggestionInput): Promise<A
     .map((metric) => `- ${metric.month}: LCP ${metric.perf.coreWebVitals.lcp}s, INP ${Math.round(metric.perf.coreWebVitals.inp)}ms, CLS ${metric.perf.coreWebVitals.cls}, A11y ${Math.round(metric.perf.accessibility * 100)}%, Throughput ${Math.round(metric.flow.throughputRatio * 100)}%, Quality Issues ${metric.flow.qualityIssuesCount ?? 0}`)
     .join('\n');
 
-  const prompt = `Generate up to 3 actionable accessibility and delivery improvements.
-Project: ${project?.name ?? input.latestMetrics.projectId}
-Domain: ${project?.url ?? 'unknown'}
-Latest month ${latestMetrics.month} metrics:
-  - LCP: ${latestMetrics.perf.coreWebVitals.lcp}s
-  - INP: ${Math.round(latestMetrics.perf.coreWebVitals.inp)}ms
-  - CLS: ${latestMetrics.perf.coreWebVitals.cls}
-  - Accessibility: ${Math.round(latestMetrics.perf.accessibility * 100)}%
-  - Throughput: ${Math.round(latestMetrics.flow.throughputRatio * 100)}%
-  - WIP items: ${latestMetrics.flow.wipCount ?? Math.round(latestMetrics.flow.wipRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
-  - Completed items: ${latestMetrics.flow.throughputCount ?? Math.round(latestMetrics.flow.throughputRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
-  - Quality issues (14d): ${latestMetrics.flow.qualityIssuesCount ?? 0}
-Historical trend (latest to oldest):
-${groupedHistory || '- no history available'}
-${completedSuggestionText ? `Previously completed suggestion: "${completedSuggestionText}"` : ''}
+  const prompt = `
+  You are an expert in web performance, accessibility, and delivery flow optimization.  
+  You have access to:  
+    - Last month’s CrUX metrics  
+    - Jira tickets for each of the project 
+    - Flow metrics for the project
+  Your task: generate up to 3 **actionable improvement suggestions** that enhance **web performance (LCP, INP, CLS), accessibility, or delivery flow**.  
+  
+  # Context:
+    Project: ${project?.name ?? input.latestMetrics.projectId}
+    Domain: ${project?.url ?? 'unknown'}
+    Latest month ${latestMetrics.month} metrics:
+      - LCP: ${latestMetrics.perf.coreWebVitals.lcp}s
+      - INP: ${Math.round(latestMetrics.perf.coreWebVitals.inp)}ms
+      - CLS: ${latestMetrics.perf.coreWebVitals.cls}
+      - Accessibility: ${Math.round(latestMetrics.perf.accessibility * 100)}%
+      - Throughput: ${Math.round(latestMetrics.flow.throughputRatio * 100)}%
+      - WIP items: ${latestMetrics.flow.wipCount ?? Math.round(latestMetrics.flow.wipRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
+      - Completed items: ${latestMetrics.flow.throughputCount ?? Math.round(latestMetrics.flow.throughputRatio * (latestMetrics.flow.totalItemsCount ?? 0))}
+      - Quality issues (14d): ${latestMetrics.flow.qualityIssuesCount ?? 0}
+  
+    Historical trend:  
+    ${groupedHistory || '- no history available'}  
+    Previously completed suggestion (avoid repeating):  
+    ${completedSuggestionText ? `"${completedSuggestionText}"` : 'none'}  
 
-Rules:
-- Focus on improving web performance, accessibility, or delivery flow.
-- Each suggestion must include a one sentence rationale explaining why.
-- Return JSON array of objects with keys "text" and "rationale".
-- Avoid suggestions already in this list: ${Array.from(excludeTexts).join('; ') || 'none'}.
-- Keep each suggestion under 160 characters.`;
+  # Rules:
+    - Focus on improving web performance, accessibility, or delivery flow.
+    - Each suggestion must include a **short, clear action** and a **one-sentence rationale**.  
+    - Return JSON array of objects with keys "text" and "rationale".
+    - Avoid suggestions already in this list: ${Array.from(excludeTexts).join('; ') || 'none'}.
+    - Keep each suggestion under 160 characters.
+    - Output **strictly** as a JSON array of objects with:
+        - "text": the suggestion
+        - "rationale": the explanation
+    - Return only the JSON, no extra text.    
+        `;
 
-  try {
+    try {
     const response = await fetch(OPENAI_ENDPOINT, {
       method: 'POST',
       headers: {
