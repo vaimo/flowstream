@@ -16,6 +16,7 @@ import {
   getCWVScoreColor,
 } from '../lib/utils';
 import styles from '../styles/dashboard.module.css';
+import { HomeDataHydrator } from '../components/HomeDataHydrator';
 
 async function getProjects(): Promise<Project[]> {
   return repo.getProjects();
@@ -88,8 +89,21 @@ export default async function HomePage() {
 
   const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
+  const metricsByProjectRecord = Object.fromEntries(
+    projectsWithAllMetrics.map(({ project, allMetrics }) => [project.id, allMetrics])
+  );
+
+  const latestMetricsRecord = Object.fromEntries(
+    projectsWithLatestMetrics.map(({ project, metrics }) => [project.id, metrics || undefined])
+  );
+
   return (
     <div className="container">
+      <HomeDataHydrator
+        projects={projects}
+        metricsByProject={metricsByProjectRecord}
+        latestMetrics={latestMetricsRecord}
+      />
       {/* Dashboard Header */}
       <div className="flex-between mb-4">
         <div>
