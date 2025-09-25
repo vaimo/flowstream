@@ -21,7 +21,7 @@ export default function RootLayout({
                 FlowStream AI
               </h1>
               <span className="text-small" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                Ecommerce Performance Dashboard
+                Experience is everything
               </span>
             </div>
             <nav className="flex">

@@ -2,7 +2,8 @@ import { Project, ProjectMetrics, Suggestion, QualityIncident } from '../types';
 import projectsData from '../../data/projects.json';
 import metricsData from '../../data/demo-metrics.json';
 import qualityIncidentsData from '../../data/quality-incidents.json';
-import { fetchPerformanceMetrics } from '../performance-webhook';
+import { fetchPerformanceMetricsForProject, fetchPerformanceMetricsForAllProjects, getProjectWebhookKey } from '../performance-webhook';
+import { getAccessibilityScore, deriveAccessibilityFromMetrics } from '../accessibility';
 
 let projects: Project[] = [...projectsData];
 let metrics: ProjectMetrics[] = [...metricsData];
@@ -74,8 +75,24 @@ export class MemoryRepo {
   private async getCurrentMonthMetrics(projectId: string): Promise<ProjectMetrics> {
     const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
 
-    // Get live performance data from webhook
-    const livePerformanceData = await fetchPerformanceMetrics();
+    // Get live performance data from webhook using project-specific key
+    const webhookKey = getProjectWebhookKey(projectId);
+    const livePerformanceData = await fetchPerformanceMetricsForProject(webhookKey);
+
+    // Get project to fetch URL for accessibility
+    const project = projects.find(p => p.id === projectId);
+
+    // Get live accessibility score from Google PageSpeed API
+    let accessibilityScore = getDefaultAccessibility(projectId);
+    if (project?.url) {
+      try {
+        const accessibilityResult = await getAccessibilityScore(project.url, accessibilityScore);
+        accessibilityScore = accessibilityResult.score;
+      } catch (error) {
+        console.warn(`Failed to fetch accessibility for ${projectId}:`, error);
+        // Fall back to default value
+      }
+    }
 
     // Get flow data from existing demo data if available, otherwise use defaults
     const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
@@ -85,12 +102,18 @@ export class MemoryRepo {
       projectId,
       month: currentMonth,
       perf: {
+        // Keep combined CWV for backward compatibility (use mobile as default)
         coreWebVitals: {
-          lcp: livePerformanceData?.lcp || 2.5,
-          cls: livePerformanceData?.cls || 0.1,
-          inp: livePerformanceData?.inp || 200,
+          lcp: livePerformanceData?.mobile.lcp || 2.8,
+          cls: livePerformanceData?.mobile.cls || 0.12,
+          inp: livePerformanceData?.mobile.inp || 220,
         },
-        accessibility: getDefaultAccessibility(projectId),
+        // Add device-specific breakdown
+        coreWebVitalsDevice: livePerformanceData ? {
+          desktop: livePerformanceData.desktop,
+          mobile: livePerformanceData.mobile,
+        } : undefined,
+        accessibility: accessibilityScore,
         bestPractices: getDefaultBestPractices(projectId),
         seo: getDefaultSeo(projectId),
       },
@@ -115,6 +138,72 @@ export class MemoryRepo {
   async getLatestMetrics(projectId: string): Promise<ProjectMetrics | null> {
     // Always return current month metrics from webhook for latest
     return await this.getCurrentMonthMetrics(projectId);
+  }
+
+  // Batch method for homepage - much more efficient
+  async getLatestMetricsForAllProjects(): Promise<Map<string, ProjectMetrics>> {
+    const results = new Map<string, ProjectMetrics>();
+    const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+    try {
+      // Single webhook call for all projects
+      const allPerformanceData = await fetchPerformanceMetricsForAllProjects();
+
+      // Process each project
+      for (const project of projects) {
+        const projectId = project.id;
+        const webhookKey = getProjectWebhookKey(projectId);
+        const livePerformanceData = allPerformanceData.get(webhookKey);
+
+
+        // Get accessibility score (still per-project, but async)
+        let accessibilityScore = getDefaultAccessibility(projectId);
+        if (project.url) {
+          try {
+            const accessibilityResult = await getAccessibilityScore(project.url, accessibilityScore);
+            accessibilityScore = accessibilityResult.score;
+          } catch (error) {
+            console.warn(`Failed to fetch accessibility for ${projectId}:`, error);
+          }
+        }
+
+        // Get flow data
+        const existingCurrentMonth = metrics.find(m => m.projectId === projectId && m.month === currentMonth);
+        const flowData = existingCurrentMonth?.flow || getDefaultFlowData(projectId);
+
+        const projectMetrics = enrichQualityWindow(projectId, {
+          projectId,
+          month: currentMonth,
+          perf: {
+            coreWebVitals: livePerformanceData ? {
+              lcp: livePerformanceData.mobile.lcp,
+              cls: livePerformanceData.mobile.cls,
+              inp: livePerformanceData.mobile.inp,
+            } : {
+              lcp: 2.8,
+              cls: 0.12,
+              inp: 220,
+            },
+            coreWebVitalsDevice: livePerformanceData ? {
+              desktop: livePerformanceData.desktop,
+              mobile: livePerformanceData.mobile,
+            } : undefined,
+            accessibility: accessibilityScore,
+            bestPractices: getDefaultBestPractices(projectId),
+            seo: getDefaultSeo(projectId),
+          },
+          flow: flowData
+        });
+
+        results.set(projectId, projectMetrics);
+      }
+
+      console.log(`Generated metrics for ${results.size} projects with single webhook call`);
+      return results;
+    } catch (error) {
+      console.error('Error in batch metrics fetch:', error);
+      return results;
+    }
   }
 
   // Suggestions

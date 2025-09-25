@@ -1,20 +1,26 @@
-# FlowStream AI - Ecommerce Dashboard
+# FlowStream AI - Experience is everything
 
-A production-ready, Vercel-friendly Next.js 15 dashboard for multi-project ecommerce performance tracking. Built with TypeScript, featuring Lighthouse integration, flow metrics, and AI-powered suggestions.
+A production-ready Next.js 15 dashboard for multi-project ecommerce performance tracking. Built with TypeScript, featuring live CrUX data integration, Google PageSpeed API, flow metrics, and AI-powered suggestions.
 
 ## Features
 
 ### 🎯 Core Functionality
-- **Multi-project dashboard** with health snapshots
-- **Lighthouse integration** for performance, accessibility, best practices, and SEO
+- **Multi-project dashboard** with health status indicators (Healthy, At Risk, Critical)
+- **Live CrUX data integration** via dedicated performance webhook
+- **Device-specific Core Web Vitals** (Desktop vs Mobile LCP, CLS, INP)
+- **Google PageSpeed API** for real-time accessibility scores
 - **Flow metrics** tracking (Actionable Agile methodology)
-- **AI suggestions** with rule-based improvement recommendations
-- **Real-time updates** with Next.js ISR caching
+- **AI suggestions** with OpenAI-powered and rule-based recommendations
+- **Project health assessment** based on performance and flow metrics
 
 ### 📊 Metrics Tracked
-- **Web Performance**: Lighthouse scores (Performance, A11y, Best Practices, SEO)
-- **Flow Metrics**: Throughput ratio, WIP ratio, Quality metrics, Cycle time (P50/P85/P95)
-- **Historical trends** with interactive SVG charts
+- **Core Web Vitals**: Live LCP, CLS, INP from Chrome User Experience Report (CrUX)
+  - Desktop vs Mobile breakdown with p75 percentiles
+  - Real-time data from performance webhook
+- **Web Performance**: Google PageSpeed Insights accessibility scores
+- **Flow Metrics**: Throughput, Quality issues, Cycle time (P50/P85/P95)
+- **Health Status**: Automated assessment (Healthy/At Risk/Critical)
+- **Historical trends** with demo data for performance visualization
 
 ### 🎨 Design System
 - **Vaimo brand colors** throughout the UI
@@ -48,17 +54,25 @@ Create `.env.local` with:
 # Required: API key for protected endpoints
 API_KEY=your-secret-api-key-here
 
+# Required: Google PageSpeed API for accessibility scores
+GOOGLE_PAGESPEED_API_KEY=your-pagespeed-api-key
+
 # Optional: Base URL (auto-detected in development)
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 NEXT_PUBLIC_API_KEY=your-secret-api-key-here
-
-# Optional: Live accessibility audits (Google PageSpeed Insights)
-GOOGLE_PAGESPEED_API_KEY=your-pagespeed-api-key
 
 # Optional: AI suggestions (OpenAI)
 OPENAI_API_KEY=your-openai-api-key
 OPENAI_MODEL=gpt-4o-mini
 ```
+
+### Performance Webhook Configuration
+
+The application integrates with a live CrUX data webhook:
+- **Endpoint**: `https://lokte-workflows.vaimo.network/api/v1/webhooks/3jom5U1GWCnPVME4G0KMj/sync`
+- **Data Source**: Chrome User Experience Report (CrUX)
+- **Rate Limiting**: 10-second minimum interval, 5-minute caching
+- **Metrics**: LCP, CLS, INP p75 percentiles for Desktop and Mobile
 
 ### Development
 
@@ -77,6 +91,33 @@ npm run audit:a11y -- diptyque https://www.diptyqueparis.com/
 ```
 
 Reports can also be generated automatically by the `Accessibility Audit` GitHub Action (see `.github/workflows/accessibility-audit.yml`).
+
+## Current Projects
+
+The dashboard tracks the following ecommerce sites:
+
+- **Diptyque** - Luxury fragrance brand (`https://www.diptyqueparis.com/`)
+- **Byredo** - Luxury fragrance and lifestyle (`https://www.byredo.com/eu_en`)
+- **Swiss Sense** - Sleep solutions and mattresses (`http://swissense.nl/`)
+- **Elon** - Nordic home electronics (`https://www.elon.se/`)
+
+## Data Sources & Architecture
+
+### Core Web Vitals (Live Data)
+- **Source**: CrUX (Chrome User Experience Report) via webhook
+- **Update Frequency**: Real-time with 5-minute caching
+- **Metrics**: LCP (seconds), CLS (score), INP (milliseconds)
+- **Device Breakdown**: Desktop vs Mobile p75 percentiles
+- **Rate Limiting**: 10-second minimum intervals to prevent webhook overload
+
+### Accessibility Scores (Live Data)
+- **Source**: Google PageSpeed Insights API
+- **Update Frequency**: Real-time per page load
+- **Fallback**: Project-specific default values when API unavailable
+
+### Flow Metrics (Demo Data)
+- **Source**: Static demo data for trends and analysis
+- **Metrics**: Throughput, Quality issues, Cycle times, WIP ratios
 
 ## API Usage
 
@@ -101,46 +142,26 @@ curl -X POST http://localhost:3000/api/projects \
   }'
 ```
 
-### Metrics
+### Metrics (Live + Demo Data)
 
 ```bash
-# Get project metrics
-curl "http://localhost:3000/api/projects/my-shop/metrics?month=2025-04"
+# Get current month metrics (live CrUX + PageSpeed data)
+curl "http://localhost:3000/api/projects/diptyque/metrics"
 
-# Update metrics
-curl -X POST http://localhost:3000/api/projects/my-shop/metrics \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: your-api-key" \
-  -d '{
-    "month": "2025-04",
-    "perf": {
-      "performance": 0.92,
-      "accessibility": 0.88,
-      "bestPractices": 0.95,
-      "seo": 0.91
-    },
-    "flow": {
-      "throughputRatio": 0.65,
-      "wipRatio": 0.42,
-      "qualitySpecial": 0.78,
-      "cycleTimeP50": 3,
-      "cycleTimeP85": 7,
-      "cycleTimeP95": 12
-    }
-  }'
+# Get historical metrics (demo data)
+curl "http://localhost:3000/api/projects/diptyque/metrics?month=2025-08"
 ```
 
-### Lighthouse Analysis
+### Performance Data
 
 ```bash
-# Run Lighthouse analysis (Node runtime required)
-curl -X POST http://localhost:3000/api/projects/my-shop/lighthouse \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: your-api-key" \
-  -d '{"url": "https://myshop.com"}'  # Optional: override project URL
+# Performance metrics are automatically fetched from:
+# 1. CrUX webhook for Core Web Vitals (LCP, CLS, INP)
+# 2. Google PageSpeed API for accessibility scores
+# 3. Demo data for flow metrics and trends
 
-# Get latest Lighthouse results
-curl http://localhost:3000/api/projects/my-shop/lighthouse
+# The system uses intelligent caching and rate limiting
+# No manual API calls needed for performance data
 ```
 
 ### AI Suggestions
@@ -228,32 +249,43 @@ For Vercel deployment, ensure:
 ├── app/                     # Next.js App Router
 │   ├── api/                 # API routes
 │   ├── projects/[id]/       # Project detail pages
-│   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Homepage
+│   ├── layout.tsx           # Root layout ("Experience is everything")
+│   └── page.tsx             # Homepage with health status cards
 ├── components/              # React components
+│   ├── ProjectCard.tsx      # Enhanced cards with CWV sections
+│   ├── DevicePerformanceCard.tsx # Desktop vs Mobile display
+│   └── ...
 ├── lib/                     # Core business logic
-│   ├── charts.tsx           # SVG chart components
-│   ├── lighthouse.ts        # Lighthouse integration
+│   ├── performance-webhook.ts # CrUX data integration & parsing
+│   ├── accessibility.ts     # Google PageSpeed API
 │   ├── suggestions.ts       # AI suggestion engine
-│   └── repo/               # Data layer
-├── data/                    # Seed data (JSON)
-├── styles/                  # CSS Modules
+│   ├── utils.ts            # Health status & formatting functions
+│   └── repo/               # Data layer with live data integration
+├── data/                    # Demo data (JSON) for trends
+├── styles/                  # CSS Modules with enhanced CWV styling
 └── middleware.ts            # API authentication
 ```
 
 ### Data Layer
-- **In-memory storage** with JSON seed data
-- **Repository pattern** for easy database swapping
-- **Type-safe interfaces** throughout
+- **Hybrid data sources**: Live webhook + PageSpeed API + demo data
+- **Repository pattern** with intelligent data fetching per project
+- **Type-safe interfaces** throughout with device-specific types
+- **Caching strategy**: 5-minute webhook cache, real-time accessibility
 
 ### Suggestions Engine
 Hybrid AI system that generates improvements based on:
-- Performance scores < 90%
-- Accessibility issues
-- Flow metric thresholds
-- Cycle time patterns
-  - When `OPENAI_API_KEY` is set the dashboard requests tailored suggestions from OpenAI (defaults to `gpt-4o-mini`).
-  - Falls back to deterministic rules when AI is unavailable.
+- Core Web Vitals thresholds (LCP > 2.5s, CLS > 0.1, INP > 200ms)
+- Accessibility scores < 90%
+- Flow metric thresholds and quality issues
+- Health status assessment (Critical/At Risk projects get priority)
+  - When `OPENAI_API_KEY` is set: tailored suggestions from OpenAI (`gpt-4o-mini`)
+  - Fallback: deterministic rules based on performance thresholds
+
+### Health Status System
+Projects are automatically categorized as:
+- **Healthy**: Good performance + flow metrics (score ≥ 80%)
+- **At Risk**: Moderate issues detected (score 60-80%)
+- **Critical**: Significant performance or flow problems (score < 60%)
 
 ## Deployment
 
@@ -271,19 +303,27 @@ Hybrid AI system that generates improvements based on:
 
 Required:
 - `API_KEY` - Secret key for API authentication
+- `GOOGLE_PAGESPEED_API_KEY` - **Required** for live accessibility scores via PageSpeed Insights
 
 Optional:
-- `NEXT_PUBLIC_BASE_URL` - Base URL for API calls
+- `NEXT_PUBLIC_BASE_URL` - Base URL for API calls (auto-detected)
 - `NEXT_PUBLIC_API_KEY` - Client-side API key
-- `GOOGLE_PAGESPEED_API_KEY` - Enables live accessibility checks via PageSpeed Insights
-- `OPENAI_API_KEY` / `OPENAI_MODEL` - Enables OpenAI-powered suggestions
+- `OPENAI_API_KEY` / `OPENAI_MODEL` - Enables OpenAI-powered suggestions (defaults to `gpt-4o-mini`)
+
+### Webhook Integration Notes
+
+The performance webhook is hardcoded and requires no configuration:
+- Automatically fetches CrUX data for all projects
+- Handles project key mapping (`swissense` → `swisssense`)
+- Built-in rate limiting and error handling
+- No authentication required for webhook endpoint
 
 ### Performance Notes
 
-- Lighthouse routes may take 10-60 seconds depending on target site
-- Use appropriate timeouts and memory allocation
-- Consider rate limiting for production usage
-- Monitor Vercel function duration and memory usage
+- CrUX webhook calls are rate-limited to prevent 500 errors
+- PageSpeed API calls happen per page load for real-time accessibility
+- Demo data provides historical trends without external API dependencies
+- Monitor webhook response times and cache hit ratios
 
 ## Development
 
@@ -316,25 +356,24 @@ export function CustomChart({ data, ...props }) {
 
 ## Troubleshooting
 
-### Lighthouse Issues
-- **Chrome not found**: Install Chrome/Chromium or set `CHROME_PATH`
-- **Memory errors**: Increase function memory allocation
-- **Timeouts**: Extend function timeout limits
+### Webhook Issues
+- **500 errors**: Rate limiting in effect - webhook calls limited to 10-second intervals
+- **Missing data**: Check project key mapping in `getProjectWebhookKey()` function
+- **Stale data**: 5-minute cache may show outdated values, refresh browser
 
-### API Authentication
-- Ensure `X-API-Key` header is set correctly
-- Check middleware configuration in `middleware.ts`
-- Verify environment variables are loaded
+### PageSpeed API Issues
+- **Accessibility scores missing**: Verify `GOOGLE_PAGESPEED_API_KEY` is set correctly
+- **API quota exceeded**: Monitor Google Cloud Console for usage limits
+- **Fallback values**: Default scores used when API is unavailable
 
-### Caching Problems
-- Use refresh webhook to clear caches
-- Check cache tags in API responses
-- Monitor revalidation periods
+### Health Status Problems
+- **Incorrect status**: Check health calculation in `calculateProjectHealth()` function
+- **Missing badges**: Verify CSS classes for health status colors are loaded
 
-### Performance
-- Monitor bundle sizes with `npm run build`
-- Check Lighthouse scores of the dashboard itself
-- Use Chrome DevTools for performance profiling
+### Performance Issues
+- **Slow loading**: Check webhook response times in network tab
+- **Cache problems**: Clear browser cache, check 5-minute webhook cache
+- **Rate limiting**: Wait 10 seconds between manual refreshes
 
 ## License
 

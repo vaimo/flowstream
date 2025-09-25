@@ -75,44 +75,72 @@ export function ProjectCard({ project, metrics }: ProjectCardProps) {
         )}
 
         {metrics ? (
-          <div className={styles.metricsGrid}>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>LCP</div>
-              <div className={`${styles.metricValue} ${styles[getLCPColor(metrics.perf.coreWebVitals.lcp)]}`}>
-                {formatLCP(metrics.perf.coreWebVitals.lcp)}
+          <>
+            {/* Device-specific performance if available */}
+            {metrics.perf.coreWebVitalsDevice && (
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', marginBottom: '0.7rem', color: 'rgba(51, 51, 51, 0.8)' }}>
+                  Core Web Vitals
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.7rem', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '12px', padding: '0.5rem 0.7rem', background: '#f8f8f8', borderRadius: '6px' }}>
+                    <div style={{ fontWeight: '600', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '14px' }}>🖥️</span> Desktop
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', fontSize: '11px', flexWrap: 'wrap' }}>
+                      <span className={`${styles[getLCPColor(metrics.perf.coreWebVitalsDevice.desktop.lcp)]}`}>
+                        LCP {formatLCP(metrics.perf.coreWebVitalsDevice.desktop.lcp)}
+                      </span>
+                      <span className={`${styles[getCLSColor(metrics.perf.coreWebVitalsDevice.desktop.cls)]}`}>
+                        CLS {formatCLS(metrics.perf.coreWebVitalsDevice.desktop.cls)}
+                      </span>
+                      <span className={`${styles[getINPColor(metrics.perf.coreWebVitalsDevice.desktop.inp)]}`}>
+                        INP {formatINP(metrics.perf.coreWebVitalsDevice.desktop.inp)}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '12px', padding: '0.5rem 0.7rem', background: '#f8f8f8', borderRadius: '6px' }}>
+                    <div style={{ fontWeight: '600', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '14px' }}>📱</span> Mobile
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', fontSize: '11px', flexWrap: 'wrap' }}>
+                      <span className={`${styles[getLCPColor(metrics.perf.coreWebVitalsDevice.mobile.lcp)]}`}>
+                        LCP {formatLCP(metrics.perf.coreWebVitalsDevice.mobile.lcp)}
+                      </span>
+                      <span className={`${styles[getCLSColor(metrics.perf.coreWebVitalsDevice.mobile.cls)]}`}>
+                        CLS {formatCLS(metrics.perf.coreWebVitalsDevice.mobile.cls)}
+                      </span>
+                      <span className={`${styles[getINPColor(metrics.perf.coreWebVitalsDevice.mobile.inp)]}`}>
+                        INP {formatINP(metrics.perf.coreWebVitalsDevice.mobile.inp)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Traditional metrics grid */}
+            <div className={styles.metricsGrid}>
+              <div className={styles.metric}>
+                <div className={styles.metricLabel}>A11y</div>
+                <div className={`${styles.metricValue} ${styles[getScoreColor(metrics.perf.accessibility)]}`}>
+                  {formatScore(metrics.perf.accessibility)}
+                </div>
+              </div>
+              <div className={styles.metric}>
+                <div className={styles.metricLabel}>Quality</div>
+                <div className={`${styles.metricValue} ${styles[getScoreColor(metrics.flow.qualitySpecial)]}`}>
+                  {metrics.flow.qualitySpecial > 0 ? formatScore(metrics.flow.qualitySpecial) : 'N/A'}
+                </div>
+              </div>
+              <div className={styles.metric}>
+                <div className={styles.metricLabel}>Cycle P50</div>
+                <div className={styles.metricValue}>
+                  {metrics.flow.cycleTimeP50 > 0 ? `${metrics.flow.cycleTimeP50}d` : 'N/A'}
+                </div>
               </div>
             </div>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>CLS</div>
-              <div className={`${styles.metricValue} ${styles[getCLSColor(metrics.perf.coreWebVitals.cls)]}`}>
-                {formatCLS(metrics.perf.coreWebVitals.cls)}
-              </div>
-            </div>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>INP</div>
-              <div className={`${styles.metricValue} ${styles[getINPColor(metrics.perf.coreWebVitals.inp)]}`}>
-                {formatINP(metrics.perf.coreWebVitals.inp)}
-              </div>
-            </div>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>A11y</div>
-              <div className={`${styles.metricValue} ${styles[getScoreColor(metrics.perf.accessibility)]}`}>
-                {formatScore(metrics.perf.accessibility)}
-              </div>
-            </div>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>Quality</div>
-              <div className={`${styles.metricValue} ${styles[getScoreColor(metrics.flow.qualitySpecial)]}`}>
-                {metrics.flow.qualitySpecial > 0 ? formatScore(metrics.flow.qualitySpecial) : 'N/A'}
-              </div>
-            </div>
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>Cycle P50</div>
-              <div className={styles.metricValue}>
-                {metrics.flow.cycleTimeP50 > 0 ? `${metrics.flow.cycleTimeP50}d` : 'N/A'}
-              </div>
-            </div>
-          </div>
+          </>
         ) : (
           <div className="loading">
             No metrics available

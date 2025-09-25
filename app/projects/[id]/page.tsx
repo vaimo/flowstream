@@ -21,6 +21,7 @@ import { JiraRefreshButton } from '../../../components/JiraRefreshButton';
 import { InteractiveCoreWebVitalsChart } from '../../../components/InteractiveCoreWebVitalsChart';
 import { InteractiveFlowChart } from '../../../components/InteractiveFlowChart';
 import { ClsTrendChart } from '../../../components/ClsTrendChart';
+import { DevicePerformanceCard } from '../../../components/DevicePerformanceCard';
 import styles from '../../../styles/dashboard.module.css';
 import { getAccessibilityScore, deriveAccessibilityFromMetrics } from '../../../lib/accessibility';
 import { repo } from '../../../lib/repo/memoryRepo';
@@ -164,6 +165,23 @@ export default async function ProjectDetailPage({
 
       {latestMetrics ? (
         <>
+          {/* Device Performance Cards */}
+          {latestMetrics.perf.coreWebVitalsDevice && (
+            <div className="mb-4">
+              <h3 className="text-large mb-2">Core Web Vitals by Device</h3>
+              <div className="grid">
+                <DevicePerformanceCard
+                  device="desktop"
+                  coreWebVitals={latestMetrics.perf.coreWebVitalsDevice.desktop}
+                />
+                <DevicePerformanceCard
+                  device="mobile"
+                  coreWebVitals={latestMetrics.perf.coreWebVitalsDevice.mobile}
+                />
+              </div>
+            </div>
+          )}
+
           {/* KPI Cards */}
           <div className={styles.kpiCards}>
             <div className={styles.kpiCard}>
@@ -347,7 +365,7 @@ export default async function ProjectDetailPage({
               </div>
               <InteractiveFlowChart
                 metrics={metrics}
-                width={600}
+                width="100%"
                 height={350}
               />
             </div>

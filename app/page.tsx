@@ -25,10 +25,26 @@ async function getAllProjectMetrics(projectId: string): Promise<ProjectMetrics[]
   return repo.getProjectMetrics(projectId);
 }
 
+async function getLatestProjectMetrics(projectId: string): Promise<ProjectMetrics | null> {
+  return repo.getLatestMetrics(projectId);
+}
+
+async function getBatchLatestMetrics(): Promise<Map<string, ProjectMetrics>> {
+  return repo.getLatestMetricsForAllProjects();
+}
+
 export default async function HomePage() {
   const projects = await getProjects();
+
+  // Single webhook call for all projects - MUCH faster!
+  const batchLatestMetrics = await getBatchLatestMetrics();
+
   const metricsByProject = await Promise.all(
     projects.map(async (project) => {
+      // Get live latest metrics from batch (no additional webhook calls)
+      const latestMetrics = batchLatestMetrics.get(project.id) || null;
+
+      // Get historical metrics for trends (demo data)
       const allMetrics = await getAllProjectMetrics(project.id);
       const only2025 = allMetrics.filter((metric) => metric.month.startsWith('2025'));
       const scopedMetrics = (only2025.length > 0 ? only2025 : allMetrics)
@@ -37,7 +53,7 @@ export default async function HomePage() {
 
       return {
         project,
-        latestMetrics: scopedMetrics[0] ?? null,
+        latestMetrics,
         allMetrics: scopedMetrics,
       };
     })

@@ -31,6 +31,11 @@ export type CoreWebVitals = {
   inp: number;   // Interaction to Next Paint (milliseconds)
 };
 
+export type DevicePerformanceData = {
+  desktop: CoreWebVitals;
+  mobile: CoreWebVitals;
+};
+
 export type PerfMetrics = {
   month: string;
   coreWebVitals: CoreWebVitals;
@@ -44,6 +49,7 @@ export type ProjectMetrics = {
   month: string;
   perf: {
     coreWebVitals: CoreWebVitals;
+    coreWebVitalsDevice?: DevicePerformanceData; // New field for desktop/mobile breakdown
     accessibility: number;
     bestPractices: number;
     seo: number;
